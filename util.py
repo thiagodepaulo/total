@@ -6,11 +6,34 @@ Created on Fri Jul  7 15:46:22 2017
 @author: thiagodepaulo
 """
 import re
+import glob
+import os.path
+import codecs 
+
 
 class Loader:
     
     def __init__(self):
         pass
+    
+    def from_files(self, path):
+        dirs = glob.glob(os.path.join(path,'*'));
+        class_names = []
+        class_idx = []
+        cid = -1
+        corpus = []
+        for _dir in dirs:
+            cid+= 1
+            class_names.append(os.path.basename(_dir))
+            arqs = glob.glob(os.path.join(_dir,'*'))
+            for arq in arqs:                
+                with codecs.open(arq, "r", "ISO-8859-1") as myfile:
+                    data=myfile.read().replace('\n', '')
+                corpus.append(data)
+                class_idx.append(cid)
+        result = {'corpus':corpus, 'class_index': class_idx, 'class_names':class_names}
+        return result
+    
     
     def from_text_line_by_line(self, arq):
         doc = []
@@ -74,10 +97,36 @@ class Loader:
         return d
     
     def from_sparse_arff(self,arq, delimiter=','):
+        pass
         
-        
-        
-l = Loader()
-d = l.from_arff('datasets/SyskillWebert.arff')
-print(d)
-
+#        
+#l = Loader()
+##d = l.from_arff('datasets/SyskillWebert.arff')
+#d = l.from_files('/exp/datasets/docs_rotulados/SyskillWebert-Parsed')
+#
+#import preprocessor
+#from sklearn.feature_extraction.text import CountVectorizer
+#from sklearn.datasets import fetch_20newsgroups
+#from sklearn.feature_extraction.text import TfidfTransformer
+#from sklearn.naive_bayes import MultinomialNB
+#from sklearn.linear_model import SGDClassifier
+#from sklearn.pipeline import Pipeline
+#import numpy as np
+#from sklearn import metrics
+#from sklearn.model_selection import GridSearchCV
+#
+##text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), 
+##                     ('clf', SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5, random_state=42)),])
+#
+##parameters = {'vect__ngram_range': [(1, 1), (1, 2)], 'tfidf__use_idf': (True, False), 'clf__alpha': (1e-2, 1e-3),}
+#
+#text_clf = Pipeline([('text_preproc',preprocessor.Preprocessor()), ('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), 
+#                     ('clf', MultinomialNB()),])
+#
+#parameters = {'vect__ngram_range': [(1, 1), (1, 2)], 'tfidf__use_idf': (True, False),}
+#
+#
+#gs_clf = GridSearchCV(text_clf, parameters,  cv=10, n_jobs=-1)
+#gs_clf = gs_clf.fit(d['corpus'], d['class_index'])
+#print(gs_clf.cv_results_)
+#
