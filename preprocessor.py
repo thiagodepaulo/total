@@ -17,18 +17,16 @@ import nltk
 from unidecode import unidecode
 from collections import Counter
 from nltk.stem.snowball import SnowballStemmer
-#from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.base import TransformerMixin, BaseEstimator
 import logging
 
 
-class Preprocessor():
+class Preprocessor(TransformerMixin, BaseEstimator):
     
     def __init__(self, lang='portuguese', stop_words=True, stem=True):
-        self.lang = lang
-        self.l_stopwords = nltk.corpus.stopwords.words(lang)        
+        self.lang = lang                
         self.stop_words = stop_words
-        self.stem = stem
-        self.len_min_word = 1
+        self.stem = stem        
         pass
     
     def cleaning(self, corpus):
@@ -76,8 +74,9 @@ class Preprocessor():
             self.stem_counters = { w:Counter(self.stem_map[w]) for w in self.stem_map}        
         return self.stem_counters[word].most_common(1)[0][0]
     
-    def preprocess(self, corpus, stop_words=True, stemmer=True):
-        
+    def preprocess(self, corpus, stop_words=True, stemmer=True):        
+        self.l_stopwords = nltk.corpus.stopwords.words(self.lang)
+        self.len_min_word = 1
         def do_preprocessing(l_docs):
             logging.info("preprocessing "+str(len(l_docs))+" documents")
             if stop_words:
@@ -99,10 +98,7 @@ class Preprocessor():
     
     def transform(self, X, *_):
         return self.preprocess(X, stop_words=self.stop_words, stemmer=self.stem)
-    
-    def get_params(self, deep=True):
-        return dict()
-        
+            
     
 
 #l = ['oi, como vai você?','Eu vou bem, obrigado#$% obrigadinho obrigadão falar falarão falará ']
