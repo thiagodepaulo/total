@@ -23,7 +23,7 @@ import logging
 
 class Preprocessor(TransformerMixin, BaseEstimator):
     
-    def __init__(self, lang='portuguese', stop_words=True, stem=True):
+    def __init__(self, lang='english', stop_words=True, stem=True):
         self.lang = lang                
         self.stop_words = stop_words
         self.stem = stem        
