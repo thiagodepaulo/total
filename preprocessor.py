@@ -93,7 +93,7 @@ class Preprocessor(TransformerMixin, BaseEstimator):
             corpus = do_preprocessing(corpus)        
         return corpus
     
-    def fit(self, X, y):                
+    def fit(self, X, y=None):                
         return self
     
     def transform(self, X, *_):
