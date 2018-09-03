@@ -95,6 +95,9 @@ class IMBHN(BaseEstimator, ClassifierMixin):
             print(mean_error)            
         return self
     
+    def transform(self, X):
+        return None
+    
     def predict(self, X):
         ndocs = X.shape[0]
         result = np.zeros(ndocs)
