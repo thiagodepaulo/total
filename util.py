@@ -10,6 +10,7 @@ import glob
 import os.path
 import codecs
 import numpy as np
+from collections import defaultdict
 
 class Loader:
 
@@ -164,6 +165,8 @@ class RandMatrices:
             Bmap[w_i] = B[i]
         return Amap, Bmap
 
+    def oi(self):
+        print('oi')
 
     def create_rand_matrices(self, D, W, K):
         return (self.create_rand_matrix_A(D, K), self.create_rand_matrix_B(W, K))
@@ -180,6 +183,25 @@ class RandMatrices:
         M = len(D)    # number of documents
         return np.ones(shape=(M,K))
 
+    def create_label_init_matrix_B(self, M, D, y, K, beta=0.0, unlabelled_idx=-1):
+        ndocs,nwords = M.shape
+        B = np.full((nwords, K),beta)
+        count={}
+        for word in range(nwords): count[word] = defaultdict(int)
+        rows,cols = M.nonzero()
+        for row,col in zip(rows,cols):
+            label = y[row]
+            if label != unlabelled_idx:
+                count[col][y[row]] += M[row,col]
+                count[col][-1] += M[row,col]
+        for word in range(nwords):
+            for cls in count[word]:
+                if cls != -1: B[word][cls] = (beta + count[word][cls])/(beta + count[word][-1])
+        return B
+
+    def create_label_init_matrices(self, X, D, W, K, y, beta=0.0, unlabelled_idx=-1):
+        return (self.create_rand_matrix_A(D, K), self.create_label_init_matrix_B(X, D, y, K, beta, unlabelled_idx))
+    
     def create_fromB_matrix_A(self, X, D, B):
         K = len(B[0])
         M = len(D)    # number of documents

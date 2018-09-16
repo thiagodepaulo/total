@@ -18,7 +18,7 @@ class PBG(BaseEstimator, ClassifierMixin):
     def __init__(self, n_components, alpha=0.05, beta=0.0001, local_max_itr=50,
               global_max_itr=50, local_threshold = 1e-6, global_threshold = 1e-6,
               max_time=18000, save_interval=-1, out_dir='.', out_A='A', out_B='B',
-              calc_q=False, debug=False):
+              calc_q=False, debug=False, rand_init=False):
         self.n_components = n_components
         self.alpha = alpha
         self.beta = beta
@@ -33,6 +33,7 @@ class PBG(BaseEstimator, ClassifierMixin):
         self.out_B = out_B
         self.calc_q = calc_q
         self.debug = debug
+        self.rand_init = rand_init
 
     def normalizedbycolumn_map(self, B):
         n = len(B.values()[0])
@@ -141,7 +142,7 @@ class PBG(BaseEstimator, ClassifierMixin):
         rand = RandMatrices()
         #D -> set of documents indices, W-> set of word indices, K-> number of topics
         D, W, K = range(X.shape[0]), range(X.shape[1]), self.n_components
-        A,B = rand.create_rand_matrices(D ,W ,K )
+        A,B = rand.create_rand_matrices(D ,W ,K ) if self.rand_init else rand.create_label_init_matrices(X, D, W, K, y, self.beta,-1)
         # convert matriz
         Xcsc = X.tocsc()
         self.bgp(X, Xcsc, W, D, A, B, labelled=y)
